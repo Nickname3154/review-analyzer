@@ -1,6 +1,6 @@
 import streamlit as st
 from scraper import get_reviews
-from review_analyzer import summarize_reviews_kobart, analyze_sentiment_kcbert
+from review_analyzer import summarize_reviews_kobart, analyze_sentiment_kcbert, load_kcbert_sentiment_pipeline, load_kobart_summarizer
 
 st.title("쿠팡 리뷰 요약 및 분석기")
 
@@ -15,8 +15,10 @@ if st.button("리뷰 가져오기 및 분석"):
         st.success(f"{len(reviews)}개의 리뷰를 가져왔습니다!")
 
         with st.spinner("요약 및 분석 중입니다..."):
-            summary = summarize_reviews_kobart(reviews)
-            sentiment = analyze_sentiment_kcbert(reviews)
+            tokenizer, summarizer_model = load_kobart_summarizer()
+            sentiment_pipeline = load_kcbert_sentiment()
+            summary = summarize_reviews_kobart(reviews, tokenizer, summarizer_model)
+            sentiment = analyze_sentiment_kcbert(reviews, sentiment_pipeline)
 
         st.subheader("리뷰 요약")
         st.write(summary)

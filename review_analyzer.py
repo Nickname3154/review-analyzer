@@ -16,9 +16,6 @@ def load_kobart_summarizer():
     model = BartForConditionalGeneration.from_pretrained(model_name)
     return tokenizer, model
 
-tokenizer, summarizer_model = load_kobart_summarizer()
-sentiment_pipeline = load_kcbert_sentiment()
-
 # 3. 리뷰 요약 함수
 def summarize_reviews_kobart(reviews, tokenizer, summarizer_model):
     filtered = [r.strip() for r in reviews if r.strip()]

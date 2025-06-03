@@ -10,14 +10,17 @@ if st.button("리뷰 가져오기 및 분석"):
     with st.spinner("리뷰를 가져오는 중입니다..."):
         reviews = get_reviews(product_url)
 
-    st.success(f"{len(reviews)}개의 리뷰를 가져왔습니다!")
+    if not reviews:
+        st.warning("리뷰를 가져오지 못했습니다. URL이 맞는지, 혹은 리뷰가 있는 상품인지 확인해주세요.")
+    else:
+        st.success(f"{len(reviews)}개의 리뷰를 가져왔습니다!")
 
-    with st.spinner("요약 및 분석 중입니다..."):
-        summary = summarize_reviews(reviews)
-        sentiment = analyze_sentiment(reviews)
+        with st.spinner("요약 및 분석 중입니다..."):
+            summary = summarize_reviews(reviews)
+            sentiment = analyze_sentiment(reviews)
 
-    st.subheader("리뷰 요약")
-    st.write(summary)
+        st.subheader("리뷰 요약")
+        st.write(summary)
 
-    st.subheader("감성 분석")
-    st.write(sentiment)
+        st.subheader("감성 분석")
+        st.write(sentiment)

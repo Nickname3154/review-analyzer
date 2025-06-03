@@ -1,6 +1,6 @@
 import streamlit as st
 from scraper import get_reviews
-from review_analyzer import summarize_reviews, analyze_sentiment
+from review_analyzer import summarize_reviews_kobart, nalyze_sentiment_kcbert
 
 st.title("쿠팡 리뷰 요약 및 분석기")
 

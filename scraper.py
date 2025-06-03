@@ -1,21 +1,39 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+import time
 
-def get_reviews(product_url):
-    reviews = []
-    headers = {"User-Agent": "Mozilla/5.0"}
+def get_reviews(product_url, max_reviews=20):
+    options = Options()
+    options.add_argument("--headless")  # 브라우저 창 안 띄움
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
-    response = requests.get(product_url, headers=headers)
-    if response.status_code != 200:
-        print(f"[오류] 페이지 요청 실패. 상태 코드: {response.status_code}")
-        return reviews
+    driver = webdriver.Chrome(options=options)
+    driver.get(product_url)
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    review_spans = soup.select("span.twc-bg-white")
+    time.sleep(2)  # 페이지 로딩 대기
 
-    for span in review_spans:
-        text = span.get_text(separator=" ", strip=True)
-        if text:
-            reviews.append(text)
+    reviews = set()
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    scroll_count = 0
 
-    return reviews
+    while len(reviews) < max_reviews and scroll_count < 10:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)  # 스크롤 후 로딩 대기
+
+        # 리뷰 텍스트 요소 추출
+        review_elements = driver.find_elements(By.CSS_SELECTOR, "div.sdp-review__article__list__review__content span")
+
+        for elem in review_elements:
+            reviews.add(elem.text)
+
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break  # 더 이상 로드되는 내용이 없을 경우 종료
+        last_height = new_height
+        scroll_count += 1
+
+    driver.quit()
+    return list(reviews)[:max_reviews]

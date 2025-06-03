@@ -25,7 +25,7 @@ def summarize_reviews_kobart(reviews, tokenizer, summarizer_model):
     text = " ".join(filtered[:20])
     inputs = tokenizer.encode(text, return_tensors="pt", max_length=1024, truncation=True)
     try:
-        summary_ids = model.generate(inputs, max_length=128, min_length=30, length_penalty=2.0, num_beams=4)
+        summary_ids = summarizer_model.generate(inputs, max_length=128, min_length=30, length_penalty=2.0, num_beams=4)
         summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
         return summary
     except Exception as e:

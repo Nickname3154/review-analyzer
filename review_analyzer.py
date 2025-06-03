@@ -6,7 +6,7 @@ from collections import Counter
 def load_kcbert_sentiment_pipeline():
     model_name = "beomi/KcBERT-base"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained("beomi/KcBERT-sentiment")  # 감성분석용 fine-tuned 모델
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)  # 감성분석용 fine-tuned 모델
     return pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
 # 2. 요약용 KoBART 모델 로드

@@ -1,5 +1,5 @@
 import streamlit as st
-from coupang_scraper import get_reviews
+from scraper import get_reviews
 from review_analyzer import summarize_reviews, analyze_sentiment
 
 st.title("쿠팡 리뷰 요약 및 분석기")

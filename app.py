@@ -15,8 +15,8 @@ if st.button("리뷰 가져오기 및 분석"):
         st.success(f"{len(reviews)}개의 리뷰를 가져왔습니다!")
 
         with st.spinner("요약 및 분석 중입니다..."):
-            summary = summarize_reviews(reviews)
-            sentiment = analyze_sentiment(reviews)
+            summary = summarize_reviews_kobart(reviews)
+            sentiment = analyze_sentiment_kcbert(reviews)
 
         st.subheader("리뷰 요약")
         st.write(summary)

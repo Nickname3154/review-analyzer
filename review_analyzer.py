@@ -1,45 +1,31 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, PreTrainedTokenizerFast, BartForConditionalGeneration
-from transformers import pipeline
+import os
+import openai
 from collections import Counter
 
-# 1. 감성 분석용 KcBERT 모델 로드
-def load_kcbert_sentiment_pipeline():
-    model_name = "beomi/KcBERT-base"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)  # 감성분석용 fine-tuned 모델
-    return pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
+# OpenAI API 키 설정 (환경 변수 OPENAI_API_KEY를 사용하는 방식)
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# 2. 요약용 KoBART 모델 로드
-def load_kobart_summarizer():
-    model_name = "digit82/kobart-summarization"
-    tokenizer = PreTrainedTokenizerFast.from_pretrained(model_name)
-    model = BartForConditionalGeneration.from_pretrained(model_name)
-    return tokenizer, model
-
-# 3. 리뷰 요약 함수
-def summarize_reviews_kobart(reviews, tokenizer, summarizer_model):
-    filtered = [r.strip() for r in reviews if r.strip()]
-    if not filtered:
+def summarize_reviews_openai(reviews):
+    if not reviews:
         return "요약할 리뷰가 없습니다."
 
-    text = " ".join(filtered[:20])
-    inputs = tokenizer.encode(text, return_tensors="pt", max_length=1024, truncation=True)
-    try:
-        summary_ids = summarizer_model.generate(inputs, max_length=128, min_length=30, length_penalty=2.0, num_beams=4)
-        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-        return summary
-    except Exception as e:
-        return f"[요약 실패] 에러: {e}"
+    joined_reviews = "\n".join(reviews[:20])
 
-# 4. 감정 분석 함수
-def analyze_sentiment_kcbert(reviews, sentiment_pipeline):
-    filtered = [r.strip() for r in reviews if r.strip()]
-    if not filtered:
-        return {"긍정": 0, "부정": 0, "에러": "분석할 리뷰가 없습니다."}
+    prompt = f"""다음은 한국어로 된 상품 리뷰입니다. 이 리뷰들을 읽고 핵심 내용을 요약해 주세요:
+
+{joined_reviews}
+
+요약:"""
 
     try:
-        results = sentiment_pipeline(filtered[:20])
-        counter = Counter([res['label'] for res in results])
-        return dict(counter)
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "당신은 한국어 리뷰 요약 전문가입니다."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=300,
+        )
+        return response.choices[0].message["content"].strip()
     except Exception as e:
-        return {"에러": str(e)}

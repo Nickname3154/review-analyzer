@@ -16,7 +16,7 @@ if st.button("리뷰 가져오기 및 분석"):
 
         with st.spinner("요약 및 분석 중입니다..."):
             tokenizer, summarizer_model = load_kobart_summarizer()
-            sentiment_pipeline = load_kcbert_sentiment()
+            sentiment_pipeline = load_kcbert_sentiment_pipeline()
             summary = summarize_reviews_kobart(reviews, tokenizer, summarizer_model)
             sentiment = analyze_sentiment_kcbert(reviews, sentiment_pipeline)
 

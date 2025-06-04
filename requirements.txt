@@ -6,3 +6,4 @@ torch
 accelerate
 openai
 python-dotenv
+selenium

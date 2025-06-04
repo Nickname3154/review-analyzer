@@ -1,3 +1,4 @@
+import openai
 from openai import OpenAI
 openai.api_key = "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"
 client = OpenAI()  # 환경변수 OPENAI_API_KEY 또는 Streamlit secrets에서 자동 로드됨

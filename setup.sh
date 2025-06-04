@@ -1,36 +1,27 @@
 #!/bin/bash
 
-# 필수 시스템 패키지 설치
-apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    gnupg \
-    ca-certificates \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    fonts-liberation \
-    xdg-utils
+# 필수 라이브러리 설치
+sudo apt-get update && sudo apt-get install -y \
+  libnss3 \
+  libxss1 \
+  fonts-liberation \
+  libasound2 \
+  libatk-bridge2.0-0 \
+  libatk1.0-0 \
+  libcups2 \
+  libdbus-1-3 \
+  libgdk-pixbuf2.0-0 \
+  libnspr4 \
+  libx11-xcb1 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxrandr2 \
+  xdg-utils \
+  wget
 
-# Chrome 설치
+# Google Chrome 설치
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-dpkg -i google-chrome-stable_current_amd64.deb || apt-get -fy install
+sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-# ChromeDriver 버전 일치
-CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
-CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-
-wget -N "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-unzip -o chromedriver_linux64.zip -d /usr/local/bin/
-chmod +x /usr/local/bin/chromedriver
-
-# 환경 변수 설정 (선택적으로 .bashrc나 Dockerfile에서도 설정 가능)
-export CHROME_BIN=/usr/bin/google-chrome
-export PATH=$PATH:/usr/local/bin
+# WebDriver 설치 (옵션)
+pip install webdriver-manager

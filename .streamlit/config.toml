@@ -1,2 +1,12 @@
-[watcher]
-run_on_save = false
+[server]
+headless = true
+port = 8501
+enableCORS = false
+enableXsrfProtection = false
+
+[theme]
+base="light"
+
+[runner]
+# setup.sh 실행 후 app.py 실행
+command = "./setup.sh && streamlit run app.py"

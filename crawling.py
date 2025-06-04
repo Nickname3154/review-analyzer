@@ -1,43 +1,47 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 
+def init_driver():
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # UI 없는 환경에서도 실행 가능
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.implicitly_wait(5)
+    return driver
 
-def init():
-    global driver
-    driver = webdriver.Chrome(r'../driver/chromedriver')
-    driver.implicitly_wait(3)
-    baseurl = 'https://www.coupang.com/vp/products/36647347?itemId=135209860&vendorItemId=73624129122&sourceType=CATEGORY&categoryId=178451&isAddedCart='
-    driver.get(baseurl)
+def get_reviews(url):
+    driver = init_driver()
+    driver.get(url)
     time.sleep(2)
 
-def run0():
-    button_review = driver.find_elements_by_xpath('//*[@id="btfTab"]/ul[1]/li[2]') #상담평
-    print(button_review[0].text)
-    button_review[0].click()
-    time.sleep(3)
-    
-    soup = BeautifulSoup(driver.page_source, 'html.parser', from_encoding='utf-8')
-    #print(soup.prettify())
-    articles=soup.findAll('article', class_='sdp-review__article__list js_reviewArticleReviewList')
-    
-    
-    for a in articles:
-        nametag=a.find('div', class_='sdp-review__article__list__info__user') 
-        headlinetag=a.find('div', class_='sdp-review__article__list__headline') 
-        contenttag=a.find('div', class_='sdp-review__article__list__review__content js_reviewArticleContent')
-        name=''
-        headline=''
-        content=''
-        if(nametag!=None):
-            name=nametag.text
-        if(headlinetag!=None):
-            headline=headlinetag.text
-        if(contenttag!=None):
-            content=contenttag.text
-        print('-----------------------------------------',name)
-        print(headline,content)
+    try:
+        # 리뷰 탭 클릭
+        tabs = driver.find_elements(By.CSS_SELECTOR, '#btfTab > ul > li')
+        for tab in tabs:
+            if '리뷰' in tab.text or '상품리뷰' in tab.text:
+                tab.click()
+                break
+        time.sleep(2)
+    except Exception as e:
+        print(f"[오류] 리뷰 탭 클릭 실패: {e}")
+        driver.quit()
+        return []
 
-init()
-run0()
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    articles = soup.find_all('article', class_='sdp-review__article__list')
+    reviews = []
+
+    for a in articles:
+        content_tag = a.find('div', class_='sdp-review__article__list__review__content')
+        if content_tag:
+            content = content_tag.get_text(strip=True)
+            reviews.append(content)
+
+    driver.quit()
+    return reviews

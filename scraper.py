@@ -12,7 +12,7 @@ def get_reviews(url, max_reviews=20):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
+    chrome_options.binary_location = "/usr/bin/google-chrome" # 경로 명시
 
     # WebDriver 설정
     driver = webdriver.Chrome(

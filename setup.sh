@@ -25,3 +25,6 @@ sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
 # WebDriver 설치 (옵션)
 pip install webdriver-manager
+
+export CHROME_BIN="/usr/bin/google-chrome"
+export PATH="$PATH:/usr/bin"

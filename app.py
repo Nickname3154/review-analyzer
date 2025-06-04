@@ -28,5 +28,5 @@ if st.button("리뷰 분석 시작"):
         st.subheader("리뷰 요약")
         st.write(summary)
 
-        st.subheader("감성 분석 결과")
+        st.subheader("분석 결과")
         st.write(sentiment)

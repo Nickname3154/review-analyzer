@@ -4,6 +4,5 @@ beautifulsoup4
 transformers
 torch
 accelerate
-sentencepiece
 openai
 python-dotenv

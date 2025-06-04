@@ -1,9 +1,9 @@
 import streamlit as st
 from review_analyzer import summarize_reviews_openai, analyze_sentiment_openai
 
-st.title("쿠팡 리뷰 요약 및 감정 분석 (OpenAI 기반)")
+st.title("리뷰 요약 및 감정 분석 (OpenAI 기반)")
 
-product_url = st.text_input("쿠팡 상품 URL을 입력하세요:")
+product_url = st.text_input("상품 URL을 입력하세요:")
 
 if st.button("리뷰 가져오기 및 분석"):
     # 테스트용 샘플 리뷰. 실제 크롤링 연동 시 get_reviews(product_url)로 변경 가능

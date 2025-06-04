@@ -1,12 +1,20 @@
 import streamlit as st
 from review_analyzer import summarize_reviews_openai, analyze_sentiment_openai
 
-st.title("쿠팡 리뷰 요약 및 감성 분석기 (OpenAI 기반)")
+st.title("리뷰 요약 및 감성 분석기 (OpenAI 기반)")
 
 # 사용자에게 OpenAI API 키 입력 받기
 api_key = st.text_input("OpenAI API 키를 입력하세요", type="password")
 
-product_url = st.text_input("쿠팡 상품 URL을 입력하세요 :")
+mport streamlit as st
+from review_analyzer import summarize_reviews_openai, analyze_sentiment_openai
+
+st.title("리뷰 요약 및 감성 분석기 (OpenAI 기반)")
+
+# 사용자에게 OpenAI API 키 입력 받기
+api_key = st.text_input("OpenAI API 키를 입력하세요", type="password")
+
+product_url = st.text_input("상품 URL을 입력하세요 :")
 
 if st.button("리뷰 분석 시작"):
     if not api_key:

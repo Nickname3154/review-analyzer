@@ -1,0 +1,7 @@
+{
+  "name": "Your Project Name",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh"
+}

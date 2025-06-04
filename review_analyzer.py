@@ -40,7 +40,7 @@ def analyze_sentiment_openai(reviews, api_key):
                 },
                 {
                     "role": "user",
-                    "content": f"다음 리뷰들을 감성 분석해줘. 긍정/부정으로 분류해서 개수를 세줘:\n{text}"
+                    "content": f"다음 리뷰들을 감성 분석해줘. 긍정/부정으로 분류해서 개수를 세줘 전체적인 분석도 첨가해줘:\n{text}"
                 }
             ],
             temperature=0.5,

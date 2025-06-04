@@ -1,36 +1,51 @@
 import os
 from openai import OpenAI
-os.environ["OPENAI_API_KEY"] = "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"
-client = OpenAI()  # 환경변수 OPENAI_API_KEY 또는 Streamlit secrets에서 자동 로드됨
+from collections import Counter
 
-def summarize_reviews_openai(reviews):
+def summarize_reviews_openai(reviews, api_key):
     try:
-        text = "\n".join(reviews[:20])  # 너무 긴 경우 요약 제한
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "당신은 리뷰 요약 전문가입니다."},
-                {"role": "user", "content": f"다음 리뷰들을 간결하고 핵심적으로 요약해줘:\n{text}"}
-            ],
-            temperature=0.7,
-            max_tokens=500
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"[요약 실패] 에러: {str(e)}"
-
-def analyze_sentiment_openai(reviews):
-    try:
+        client = OpenAI(api_key=api_key)
         text = "\n".join(reviews[:20])
+
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "당신은 감정 분석 전문가입니다."},
-                {"role": "user", "content": f"다음 리뷰들을 보고 긍정 또는 부정으로 분석한 뒤 각각 몇 개씩 있는지 요약해줘:\n{text}"}
+                {
+                    "role": "system",
+                    "content": "당신은 한국어 리뷰를 요약해주는 도우미입니다."
+                },
+                {
+                    "role": "user",
+                    "content": f"다음 리뷰들을 요약해줘:\n{text}"
+                }
             ],
             temperature=0.7,
-            max_tokens=500
+            max_tokens=300
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"[감정 분석 실패] 에러: {str(e)}"
+        return f"[요약 실패] 에러: {e}"
+
+def analyze_sentiment_openai(reviews, api_key):
+    try:
+        client = OpenAI(api_key=api_key)
+        text = "\n".join(reviews[:20])
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "당신은 한국어 상품 리뷰의 감정을 분석하는 도우미입니다. 각 리뷰가 긍정적인지 부정적인지 판단하세요."
+                },
+                {
+                    "role": "user",
+                    "content": f"다음 리뷰들을 감성 분석해줘. 긍정/부정으로 분류해서 개수를 세줘:\n{text}"
+                }
+            ],
+            temperature=0.5,
+            max_tokens=200
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return {"에러": str(e)}

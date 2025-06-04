@@ -20,6 +20,7 @@ def get_reviews(product_url, max_reviews=20):
     """
     # 브라우저 옵션 설정
     options = Options()
+    options.binary_location = "/usr/bin/chromium"
     options.add_argument("--headless")  # GUI 없이 실행
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")

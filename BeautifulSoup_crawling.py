@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 import time
 import re
 
-def get_gmarket_reviews(goodscode, max_pages=3, max_reviews=20):
+def get_reviews(goodscode, max_pages=3, max_reviews=20):
     """
-    G마켓 상품 코드 (goodscode)를 기반으로 리뷰 텍스트를 크롤링하는 함수
+    상품 코드 (goodscode)를 기반으로 리뷰 텍스트를 크롤링하는 함수
     - goodscode: G마켓 상품 페이지의 goodscode 파라미터
     - max_pages: 최대 페이지 수
     - max_reviews: 최대 리뷰 개수
@@ -47,10 +47,3 @@ def get_gmarket_reviews(goodscode, max_pages=3, max_reviews=20):
         time.sleep(0.5)
 
     return reviews
-
-if __name__ == "__main__":
-    goodscode = "1806672542"  # 테스트용 상품 코드
-    result = get_gmarket_reviews(goodscode, max_pages=5, max_reviews=15)
-    print(f"총 {len(result)}개의 리뷰 수집됨:\n")
-    for i, r in enumerate(result, 1):
-        print(f"{i}. {r}")

@@ -1,50 +1,56 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+import requests
 from bs4 import BeautifulSoup
-from webdriver_manager.chrome import ChromeDriverManager
 import time
+import re
 
-def get_reviews(url, max_reviews=20):
-    # Chrome 옵션 설정 (headless 모드 등)
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/google-chrome" # 경로 명시
+def get_gmarket_reviews(goodscode, max_pages=3, max_reviews=20):
+    """
+    G마켓 상품 코드 (goodscode)를 기반으로 리뷰 텍스트를 크롤링하는 함수
+    - goodscode: G마켓 상품 페이지의 goodscode 파라미터
+    - max_pages: 최대 페이지 수
+    - max_reviews: 최대 리뷰 개수
+    
+    HTML이 정적으로 렌더링된 리뷰를 수집
+    """
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/114.0 Safari/537.36"
+        )
+    }
+    reviews = []
 
-    # WebDriver 설정
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=chrome_options
-    )
+    for page in range(1, max_pages + 1):
+        url = f"https://item.gmarket.co.kr/Item?goodscode={goodscode}&page={page}"
+        res = requests.get(url, headers=headers)
+        if res.status_code != 200:
+            print(f"[Error] 페이지 로드 실패 {res.status_code} (페이지 {page})")
+            break
 
-    try:
-        driver.get(url)
-        time.sleep(3)
+        soup = BeautifulSoup(res.text, "html.parser")
+        review_divs = soup.select("div.review__section__content")
 
-        # 리뷰 탭 클릭
-        try:
-            review_tab = driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]')
-            review_tab.click()
-            time.sleep(3)
-        except Exception as e:
-            print("리뷰 탭 클릭 실패:", e)
-            return [f"리뷰 탭 클릭 실패: {e}"]
+        if not review_divs:
+            print("⚠️ 리뷰를 찾지 못했습니다 (정적 HTML 리뷰 없음)")
+            break
 
-        # 페이지 소스를 BeautifulSoup으로 파싱
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        articles = soup.find_all('article', class_='sdp-review__article__list', limit=max_reviews)
+        for div in review_divs:
+            text = re.sub(r"\s+", " ", div.get_text(strip=True))
+            reviews.append(text)
+            if len(reviews) >= max_reviews:
+                break
 
-        reviews = []
-        for article in articles:
-            content_tag = article.find('div', class_='sdp-review__article__list__review__content')
-            if content_tag:
-                review_text = content_tag.get_text(strip=True)
-                reviews.append(review_text)
+        if len(reviews) >= max_reviews:
+            break
 
-        return reviews if reviews else ["리뷰를 찾을 수 없습니다."]
+        time.sleep(0.5)
 
-    finally:
-        driver.quit()
+    return reviews
+
+if __name__ == "__main__":
+    goodscode = "1806672542"  # 테스트용 상품 코드
+    result = get_gmarket_reviews(goodscode, max_pages=5, max_reviews=15)
+    print(f"총 {len(result)}개의 리뷰 수집됨:\n")
+    for i, r in enumerate(result, 1):
+        print(f"{i}. {r}")
